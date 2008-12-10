@@ -1,13 +1,13 @@
 require 'rubygems'
 require 'rake/gempackagetask'
 
-PLUGIN = "merb_geokit"
-NAME = "merb_geokit"
+PLUGIN = "merb_geokit_dm"
+NAME = "merb_geokit_dm"
 VERSION = "0.0.2"
-AUTHOR = "Dusty Doris"
-EMAIL = "merb@dusty.name"
+AUTHOR = "Saimon Moore"
+EMAIL = "saimonmoore@gmail.com"
 HOMEPAGE = "http://code.google.com/p/merb-geokit/"
-SUMMARY = "Merb plugin that provides the geokit rails plugin"
+SUMMARY = "Merb plugin that provides the geokit rails plugin for DataMapper"
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
@@ -20,8 +20,8 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency('merb', '>= 0.5.0')
-  s.add_dependency('activerecord')
+  s.add_dependency('merb', '>= 1.0.4')
+  s.add_dependency('dm-core', '0.9.8')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
   s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,specs}/**/*")

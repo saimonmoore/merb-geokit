@@ -24,8 +24,14 @@ if defined?(Merb::Plugins)
 
   require config_file
 
-  # Automatically mix in distance finder support into ActiveRecord classes.
-  ActiveRecord::Base.send :include, GeoKit::ActsAsMappable
+  if defined?(ActiveRecord::Base)
+    # Automatically mix in distance finder support into ActiveRecord classes.
+    ActiveRecord::Base.send :include, GeoKit::ActsAsMappable    
+  end
+  
+  if defined?(DataMapper::Resource)
+    # Don't Automatically mix in distance finder support into DataMapper classes.
+  end  
   
   Merb::Plugins.add_rakefiles "merb_geokit/merbtasks"
 end
