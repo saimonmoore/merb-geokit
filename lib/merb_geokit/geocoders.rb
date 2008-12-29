@@ -53,8 +53,8 @@ module GeoKit
       # Main method which calls the do_geocode template method which subclasses
       # are responsible for implementing.  Returns a populated GeoLoc or an
       # empty one with a failed success code.
-      def self.geocode(address)  
-        res = do_geocode(address)
+      def self.geocode(address, locale='nl')  
+        res = do_geocode(address, locale)
         return res.success ? res : GeoLoc.new
       end  
       
@@ -106,7 +106,7 @@ module GeoKit
       private
 
       # Template method which does the geocode lookup.
-      def self.do_geocode(address)
+      def self.do_geocode(address, locale=nil)
         raise ArgumentError('Geocoder.ca requires a GeoLoc argument') unless address.is_a?(GeoLoc)
         url = construct_request(address)
         res = self.call_geocoder_service(url)
@@ -149,9 +149,9 @@ module GeoKit
       private 
 
       # Template method which does the geocode lookup.
-      def self.do_geocode(address)
+      def self.do_geocode(address, locale='nl')
         address_str = address.is_a?(GeoLoc) ? address.to_geocodeable_s : address
-        res = self.call_geocoder_service("http://maps.google.com/maps/geo?q=#{CGI.escape(address_str)}&output=xml&key=#{GeoKit::Geocoders::google}&oe=utf-8")
+        res = self.call_geocoder_service("http://maps.google.com/maps/geo?q=#{CGI.escape(address_str)}&output=xml&key=#{GeoKit::Geocoders::google}&oe=utf-8&hl=#{locale}")
 #        res = Net::HTTP.get_response(URI.parse("http://maps.google.com/maps/geo?q=#{CGI.escape(address_str)}&output=xml&key=#{GeoKit::Geocoders::google}&oe=utf-8"))
         return GeoLoc.new if !res.is_a?(Net::HTTPSuccess)
         xml=res.body
@@ -204,7 +204,7 @@ module GeoKit
       # Given an IP address, returns a GeoLoc instance which contains latitude,
       # longitude, city, and country code.  Sets the success attribute to false if the ip 
       # parameter does not match an ip address.  
-      def self.do_geocode(ip)
+      def self.do_geocode(ip, locale=nil)
         return GeoLoc.new unless /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})?$/.match(ip)
         url = "http://api.hostip.info/get_html.php?ip=#{ip}&position=true"
         response = self.call_geocoder_service(url)
@@ -244,7 +244,7 @@ module GeoKit
       private
 
       # For now, the geocoder_method will only geocode full addresses -- not zips or cities in isolation
-      def self.do_geocode(address)
+      def self.do_geocode(address, locale=nil)
         address_str = address.is_a?(GeoLoc) ? address.to_geocodeable_s : address
         url = "http://"+(GeoKit::Geocoders::geocoder_us || '')+"geocoder.us/service/csv/geocode?address=#{CGI.escape(address_str)}"
         res = self.call_geocoder_service(url)
@@ -276,7 +276,7 @@ module GeoKit
       private 
 
       # Template method which does the geocode lookup.
-      def self.do_geocode(address)
+      def self.do_geocode(address, locale = 'nl')
         address_str = address.is_a?(GeoLoc) ? address.to_geocodeable_s : address
         url="http://api.local.yahoo.com/MapsService/V1/geocode?appid=#{GeoKit::Geocoders::yahoo}&location=#{CGI.escape(address_str)}"
         res = self.call_geocoder_service(url)
@@ -330,11 +330,11 @@ module GeoKit
       # 
       # The failover approach is crucial for production-grade apps, but is rarely used.
       # 98% of your geocoding calls will be successful with the first call  
-      def self.do_geocode(address)
+      def self.do_geocode(address, locale='nl')
         GeoKit::Geocoders::provider_order.each do |provider|
           begin
             klass = GeoKit::Geocoders.const_get "#{provider.to_s.capitalize}Geocoder"
-            res = klass.send :geocode, address
+            res = klass.send(:geocode, address, locale)
             return res if res.success
           rescue
             logger.error("Something has gone very wrong during geocoding, OR you have configured an invalid class name in GeoKit::Geocoders::provider_order. Address: #{address}. Provider: #{provider}")
