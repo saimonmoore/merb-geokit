@@ -20,7 +20,7 @@ spec = Gem::Specification.new do |s|
   s.author = AUTHOR
   s.email = EMAIL
   s.homepage = HOMEPAGE
-  s.add_dependency('merb', '>= 1.0.4')
+  s.add_dependency('merb', '>= 1.0.7')
   s.add_dependency('dm-core', '0.9.8')
   s.require_path = 'lib'
   s.autorequire = PLUGIN
